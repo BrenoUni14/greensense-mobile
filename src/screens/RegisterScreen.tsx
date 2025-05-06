@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import styles from '../styles/registerStyles';
 import { Picker } from '@react-native-picker/picker';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { AuthContext } from '../context/AuthContext';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Nome obrigatório'),
@@ -15,6 +16,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const RegisterScreen = ({ navigation }: any) => {
+  const { login } = useContext(AuthContext); // aqui usamos o contexto
+
   return (
     <Formik
       initialValues={{
@@ -26,8 +29,9 @@ const RegisterScreen = ({ navigation }: any) => {
       }}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log('📦 Dados enviados:', values);
-        // Aqui você pode chamar uma API futuramente
+        // simulação de cadastro OK
+        console.log('📦 Dados cadastrados:', values);
+        login('token-fake'); // simula autenticação com um token
       }}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
@@ -84,8 +88,8 @@ const RegisterScreen = ({ navigation }: any) => {
             <Picker.Item label="Coletor" value="COLLECTOR" />
           </Picker>
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Registrar</Text>
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+          <Text style={styles.buttonText}>Registrar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -98,3 +102,4 @@ const RegisterScreen = ({ navigation }: any) => {
 };
 
 export default RegisterScreen;
+

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import styles from '../styles/loginStyles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { AuthContext } from '../context/AuthContext';
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('Email inválido').required('Email obrigatório'),
@@ -10,13 +11,16 @@ const loginSchema = Yup.object().shape({
 });
 
 const LoginScreen = ({ navigation }: any) => {
+  const { login } = useContext(AuthContext); // contexto de autenticação
+
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
       validationSchema={loginSchema}
       onSubmit={(values) => {
         console.log('🔐 Login enviado:', values);
-        // Aqui futuramente chamaremos o backend para autenticar
+        // Aqui você pode validar com backend futuramente
+        login('token-fake'); // simula login e redireciona para Home
       }}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
@@ -43,7 +47,7 @@ const LoginScreen = ({ navigation }: any) => {
           />
           {touched.password && errors.password && <Text style={{ color: 'red' }}>{errors.password}</Text>}
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
             <Text style={styles.buttonText}>Entrar</Text>
           </TouchableOpacity>
 
@@ -57,3 +61,4 @@ const LoginScreen = ({ navigation }: any) => {
 };
 
 export default LoginScreen;
+
