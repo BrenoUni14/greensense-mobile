@@ -20,7 +20,8 @@ const LoginScreen = ({ navigation }: any) => {
       onSubmit={(values) => {
         console.log('🔐 Login enviado:', values);
         // Aqui você pode validar com backend futuramente
-        login('token-fake'); // simula login e redireciona para Home
+        login('token-fake', 'ADMIN'); // ou 'USER', 'COLLECTOR' conforme desejado
+ // simula login e redireciona para Home
       }}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (

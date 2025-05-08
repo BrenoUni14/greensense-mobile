@@ -31,7 +31,8 @@ const RegisterScreen = ({ navigation }: any) => {
       onSubmit={(values) => {
         // simulação de cadastro OK
         console.log('📦 Dados cadastrados:', values);
-        login('token-fake'); // simula autenticação com um token
+        login('token-fake', 'ADMIN'); // ou 'USER', 'COLLECTOR' conforme desejado
+ // simula autenticação com um token
       }}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (

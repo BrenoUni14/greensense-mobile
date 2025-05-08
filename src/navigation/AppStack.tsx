@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import UserListScreen from '../screens/UserListScreen';
+import UserFormScreen from '../screens/UserFormScreen';
 import { Ionicons } from '@expo/vector-icons';
+import { AuthContext } from '../context/AuthContext';
 
-export type RootTabParamList = {
-  Home: undefined;
-  Perfil: undefined;
-};
+const Tab = createBottomTabNavigator();
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
+const AppStack = () => {
+  const { userRole } = useContext(AuthContext);
 
-const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -23,18 +23,20 @@ const BottomTabNavigator = () => {
           const icons = {
             Home: 'home',
             Perfil: 'person',
+            Usuários: 'people',
           } as const;
 
-          const iconName = icons[route.name as keyof typeof icons];
-
+          const iconName = icons[route.name as keyof typeof icons] || 'ellipse';
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Perfil" component={ProfileScreen} />
+      {userRole === 'ADMIN' && <Tab.Screen name="Usuários" component={UserListScreen} />}
+      <Tab.Screen name="UserForm" component={UserFormScreen} options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' } }} />
     </Tab.Navigator>
   );
 };
 
-export default BottomTabNavigator;
+export default AppStack;
