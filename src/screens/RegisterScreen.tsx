@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import styles from '../styles/registerStyles';
-import { Picker } from '@react-native-picker/picker';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
+import { registerRequest } from '../services/authService';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Nome obrigatório'),
@@ -16,26 +16,38 @@ const validationSchema = Yup.object().shape({
 });
 
 const RegisterScreen = ({ navigation }: any) => {
-  const { login } = useContext(AuthContext); // aqui usamos o contexto
+  const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (values: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
+    try {
+      setLoading(true);
+      const response = await registerRequest({
+        nome: values.name,
+        email: values.email,
+        senha: values.password,
+      });
+      login(response.token, response.nome); // autentica após cadastro
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      Alert.alert('Erro', 'Não foi possível criar a conta');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Formik
-      initialValues={{
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        userType: 'USER',
-      }}
+      initialValues={{ name: '', email: '', password: '', confirmPassword: '' }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        // simulação de cadastro OK
-        console.log('📦 Dados cadastrados:', values);
-        login('token-fake', 'ADMIN'); // ou 'USER', 'COLLECTOR' conforme desejado
- // simula autenticação com um token
-      }}
+      onSubmit={handleRegister}
     >
-      {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
+      {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
         <View style={styles.container}>
           <Text style={styles.title}>Criar Conta</Text>
 
@@ -80,17 +92,8 @@ const RegisterScreen = ({ navigation }: any) => {
             <Text style={{ color: 'red' }}>{errors.confirmPassword}</Text>
           )}
 
-          <Picker
-            selectedValue={values.userType}
-            onValueChange={(value) => setFieldValue('userType', value)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Usuário Comum" value="USER" />
-            <Picker.Item label="Coletor" value="COLLECTOR" />
-          </Picker>
-
-          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-          <Text style={styles.buttonText}>Registrar</Text>
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? 'Registrando...' : 'Registrar'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -103,4 +106,3 @@ const RegisterScreen = ({ navigation }: any) => {
 };
 
 export default RegisterScreen;
-

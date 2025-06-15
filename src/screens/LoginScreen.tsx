@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import styles from '../styles/loginStyles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
+import { loginRequest } from '../services/authService';
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('Email inválido').required('Email obrigatório'),
@@ -11,18 +12,27 @@ const loginSchema = Yup.object().shape({
 });
 
 const LoginScreen = ({ navigation }: any) => {
-  const { login } = useContext(AuthContext); // contexto de autenticação
+  const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (values: { email: string; password: string }) => {
+    try {
+      setLoading(true);
+      const response = await loginRequest({ email: values.email, senha: values.password });
+      login(response.token, response.nome);
+    } catch (error) {
+      console.error('Erro no login:', error);
+      Alert.alert('Erro', 'Email ou senha inválidos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
       validationSchema={loginSchema}
-      onSubmit={(values) => {
-        console.log('🔐 Login enviado:', values);
-        // Aqui você pode validar com backend futuramente
-        login('token-fake', 'ADMIN'); // ou 'USER', 'COLLECTOR' conforme desejado
- // simula login e redireciona para Home
-      }}
+      onSubmit={handleLogin}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
         <View style={styles.container}>
@@ -32,6 +42,7 @@ const LoginScreen = ({ navigation }: any) => {
             style={styles.input}
             placeholder="Email"
             keyboardType="email-address"
+            autoCapitalize="none"
             onChangeText={handleChange('email')}
             onBlur={handleBlur('email')}
             value={values.email}
@@ -48,8 +59,8 @@ const LoginScreen = ({ navigation }: any) => {
           />
           {touched.password && errors.password && <Text style={{ color: 'red' }}>{errors.password}</Text>}
 
-          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-            <Text style={styles.buttonText}>Entrar</Text>
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -62,4 +73,3 @@ const LoginScreen = ({ navigation }: any) => {
 };
 
 export default LoginScreen;
-

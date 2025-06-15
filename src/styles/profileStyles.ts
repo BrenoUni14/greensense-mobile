@@ -32,6 +32,25 @@ const profileStyles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
+  logoutButton: {
+    marginTop: 30,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#e74c3c',
+    alignItems: 'center',
+  },
+  logoutText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#aaa',
+    marginBottom: 20,
+  },
 });
+
+
 
 export default profileStyles;
