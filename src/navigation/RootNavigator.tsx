@@ -29,7 +29,7 @@ const RootNavigator = () => {
       <Stack.Screen
         name="TrashBinDetails"
         component={TrashBinDetailsScreen}
-        options={{ title: 'Detalhes da Lixeira' }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
