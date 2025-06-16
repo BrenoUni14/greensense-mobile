@@ -1,54 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from '../styles/trashBinDetailsStyles';
 
-interface Lixeira {
-  id: string;
-  codigo: string;
-  localizacao: string;
-  nivel: number;
-}
+type RootStackParamList = {
+  TrashBinDetails: { id: string; nivel: number };
+  Login: undefined;
+};
+
+type TrashBinDetailsRouteProp = RouteProp<RootStackParamList, 'TrashBinDetails'>;
 
 const TrashBinDetailsScreen = () => {
-  const route = useRoute();
-  const navigation = useNavigation();
-  const { id } = route.params as { id: string };
+  const route = useRoute<TrashBinDetailsRouteProp>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { id } = route.params;
 
-  const [lixeira, setLixeira] = useState<Lixeira | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isCollecting, setIsCollecting] = useState(false);
 
   useEffect(() => {
-    fetch(`http://<SEU-IP-LOCAL>:8080/api/lixeiras/${id}`)
-      .then((res) => res.json())
-      .then((data) => setLixeira(data))
-      .catch(() => {
-        setLixeira({
-          id,
-          codigo: 'A12',
-          localizacao: 'Rua das Flores, 123',
-          nivel: 85,
-        });
-      });
-  }, [id]);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (!lixeira) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.loading}>Carregando detalhes...</Text>
-      </View>
-    );
-  }
+  const handleLogout = () => {
+    navigation.navigate('Login');
+  };
+
+  const handleCollectionToggle = () => {
+    setIsCollecting(!isCollecting);
+  };
+
+  const handleCopyAddress = () => {
+    // Lógica para copiar endereço
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Detalhes da Lixeira</Text>
-      <Text style={styles.label}>Código: <Text style={styles.value}>{lixeira.codigo}</Text></Text>
-      <Text style={styles.label}>Localização: <Text style={styles.value}>{lixeira.localizacao}</Text></Text>
-      <Text style={styles.label}>Nível de preenchimento: <Text style={styles.value}>{lixeira.nivel}%</Text></Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#2ecc71" />
+      ) : (
+        <>
+          <Text style={styles.title}>Lixeira E03</Text>
 
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.button}>
-        <Text style={styles.buttonText}>Voltar</Text>
-      </TouchableOpacity>
+          <View style={styles.fillCardContainer}>
+            <View style={[styles.fillCard, isCollecting ? styles.gray : styles.red]}>
+              <Text style={styles.fillText}>{isCollecting ? 'Em coleta...' : '90% cheia'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoCard}>
+            <Text style={styles.infoTitle}>Informações</Text>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>ID:</Text>
+              <Text style={styles.infoValue}>E03</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Última Coleta:</Text>
+              <Text style={styles.infoValue}>20 Mar 2025</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Status do Sensor:</Text>
+              <Text style={styles.infoValue}>Online</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.collectButton, isCollecting && styles.collectButtonActive]}
+            onPress={handleCollectionToggle}
+          >
+            <Text style={styles.collectButtonText}>
+              {isCollecting ? 'Finalizar Coleta' : 'Iniciar rota de Coletas'}
+            </Text>
+          </TouchableOpacity>
+
+          {isCollecting && (
+            <View style={styles.addressCard}>
+              <Text style={styles.addressText}>Avenida Goiania, 650</Text>
+              <TouchableOpacity style={styles.copyButton} onPress={handleCopyAddress}>
+                <Icon name="content-copy" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
+      )}
     </View>
   );
 };

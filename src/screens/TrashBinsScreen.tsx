@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import styles from '../styles/trashBinsStyles';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface Lixeira {
   id: string;
@@ -31,21 +32,46 @@ const TrashBinsScreen = () => {
       });
   }, []);
 
+  const getColor = (nivel: number) => {
+    if (nivel >= 75) return styles.red;
+    if (nivel >= 50) return styles.yellow;
+    return styles.green;
+  };
+
+  const handleLogout = () => {
+    navigation.navigate('Login');
+  };
+
+  const handleTrashBinPress = (id: string, nivel: number) => {
+    navigation.navigate('TrashBinDetails', { id, nivel });
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Lixeiras</Text>
-      {lixeiras.map((lixeira) => (
-        <TouchableOpacity
-          key={lixeira.id}
-          style={styles.card}
-          onPress={() => navigation.navigate('TrashBinDetails', { id: lixeira.id })}
-        >
-          <Text style={styles.codigo}>Lixeira {lixeira.codigo}</Text>
-          <Text style={styles.info}>{lixeira.localizacao}</Text>
-          <Text style={styles.nivel}>{lixeira.nivel}% Cheia</Text>
+    <View style={styles.container}>
+      <View style={styles.topBar}>
+        <Text style={styles.greeting}>Olá,<Text style={styles.greetingBold}> Gabriel Maia</Text></Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
-      ))}
-    </ScrollView>
+      </View>
+
+      <Text style={styles.title}>Lixeiras</Text>
+
+      <FlatList
+        data={lixeiras}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[styles.binItem, getColor(item.nivel)]}
+            onPress={() => handleTrashBinPress(item.id, item.nivel)}
+          >
+            <Text style={styles.binText}>
+              Lixeira {item.codigo} - {item.nivel}% Cheia
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 };
 
