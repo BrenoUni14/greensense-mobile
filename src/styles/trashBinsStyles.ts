@@ -3,30 +3,37 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111',
-    padding: 20,
+    backgroundColor: '#000',
+    padding: 16,
   },
   title: {
-    fontSize: 24,
-    color: '#fff',
-    marginBottom: 20,
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#2ecc71',
   },
-  binItem: {
+  card: {
+    backgroundColor: '#111',
     padding: 16,
     borderRadius: 10,
     marginBottom: 12,
+    borderLeftWidth: 5,
+    borderLeftColor: '#2ecc71',
   },
-  binText: {
-    fontSize: 16,
+  codigo: {
+    fontSize: 18,
+    fontWeight: '600',
     color: '#fff',
   },
-  green: {
-    backgroundColor: '#2ecc71',
+  info: {
+    fontSize: 14,
+    color: '#aaa',
+    marginTop: 4,
   },
-  yellow: {
-    backgroundColor: '#f1c40f',
-  },
-  red: {
-    backgroundColor: '#e74c3c',
+  nivel: {
+    fontSize: 14,
+    color: '#2ecc71',
+    marginTop: 8,
+    fontWeight: 'bold',
   },
 });

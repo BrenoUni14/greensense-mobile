@@ -1,58 +1,48 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import styles from '../styles/notificationsStyles';
 
-const mockNotifications = [
-  { id: '1', title: 'Lixeira A12 está 85% cheia', date: 'Hoje, 10:30' },
-  { id: '2', title: 'Nova coleta registrada na Lixeira B98', date: 'Ontem, 16:15' },
-  { id: '3', title: 'Sensor da Lixeira C45 está offline', date: 'Há 2 dias' },
+const notifications = [
+  {
+    id: '1',
+    title: 'Lixeira A12 quase cheia',
+    description: 'O nível da lixeira A12 atingiu 80%.',
+    timestamp: 'Hoje às 10:24',
+  },
+  {
+    id: '2',
+    title: 'Coleta programada',
+    description: 'A coleta da lixeira C21 está agendada para amanhã.',
+    timestamp: 'Ontem às 15:12',
+  },
+  {
+    id: '3',
+    title: 'Lixeira B07 esvaziada',
+    description: 'A lixeira B07 foi esvaziada com sucesso.',
+    timestamp: '2 dias atrás',
+  },
 ];
 
 const NotificationsScreen = () => {
+  const renderItem = ({ item }: { item: typeof notifications[0] }) => (
+    <TouchableOpacity style={styles.notificationItem}>
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.description}>{item.description}</Text>
+      <Text style={styles.timestamp}>{item.timestamp}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notificações</Text>
-
+      <Text style={styles.header}>Notificações</Text>
       <FlatList
-        data={mockNotifications}
+        data={notifications}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.notificationCard}>
-            <Text style={styles.notificationText}>{item.title}</Text>
-            <Text style={styles.notificationDate}>{item.date}</Text>
-          </View>
-        )}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
       />
     </View>
   );
 };
 
 export default NotificationsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#111',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    color: '#2ecc71',
-    marginBottom: 20,
-    fontWeight: 'bold',
-  },
-  notificationCard: {
-    backgroundColor: '#1e1e1e',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-  },
-  notificationText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  notificationDate: {
-    color: '#888',
-    fontSize: 12,
-    marginTop: 5,
-  },
-});

@@ -1,38 +1,32 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useContext, useState, useEffect } from 'react';
 import AppStack from './AppStack';
-import TrashBinDetailsScreen from '../screens/TrashBinDetailsScreen';
-
-type RootStackParamList = {
-  Tabs: undefined;
-  TrashBinDetails: { id: string };
-};
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+import AuthStack from './AuthStack';
+import { AuthContext } from '../context/AuthContext';
+import { View, ActivityIndicator } from 'react-native';
 
 const RootNavigator = () => {
-  return (
-    <Stack.Navigator
-      {...({
-        screenOptions: {
-          headerShown: true,
-          headerStyle: { backgroundColor: '#111' },
-          headerTintColor: '#fff',
-        },
-      } as React.ComponentProps<typeof Stack.Navigator>)}
-    >
-      <Stack.Screen
-        name="Tabs"
-        component={AppStack}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="TrashBinDetails"
-        component={TrashBinDetailsScreen}
-        options={{ title: 'Detalhes da Lixeira' }}
-      />
-    </Stack.Navigator>
-  );
+  const { userToken } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuthReady = async () => {
+      // aguarda 500ms para garantir carregamento do contexto
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsLoading(false);
+    };
+
+    checkAuthReady();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#2ecc71" />
+      </View>
+    );
+  }
+
+  return userToken ? <AppStack /> : <AuthStack />;
 };
 
 export default RootNavigator;

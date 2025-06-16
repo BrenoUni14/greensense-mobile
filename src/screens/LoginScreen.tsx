@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import styles from '../styles/loginStyles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
-import { loginRequest } from '../services/authService';
 
 const loginSchema = Yup.object().shape({
   email: Yup.string().email('Email inválido').required('Email obrigatório'),
@@ -18,11 +17,27 @@ const LoginScreen = ({ navigation }: any) => {
   const handleLogin = async (values: { email: string; password: string }) => {
     try {
       setLoading(true);
-      const response = await loginRequest({ email: values.email, senha: values.password });
-      login(response.token, response.nome);
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          senha: values.password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha na autenticação');
+      }
+
+      const data = await response.json();
+
+      // Esperado: { token: "...", id: "...", nome: "..." }
+      login(data.token, data.id, data.nome);
     } catch (error) {
-      console.error('Erro no login:', error);
-      Alert.alert('Erro', 'Email ou senha inválidos');
+      Alert.alert('Erro', 'Credenciais inválidas ou servidor indisponível.');
     } finally {
       setLoading(false);
     }
@@ -59,8 +74,12 @@ const LoginScreen = ({ navigation }: any) => {
           />
           {touched.password && errors.password && <Text style={{ color: 'red' }}>{errors.password}</Text>}
 
-          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()} disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Entrar</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>

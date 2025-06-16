@@ -3,28 +3,40 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111',
+    backgroundColor: '#000',
     padding: 20,
   },
-  title: {
+  header: {
     fontSize: 24,
     color: '#2ecc71',
+    fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  listContent: {
+    paddingBottom: 20,
   },
   notificationItem: {
-    backgroundColor: '#222',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2ecc71',
   },
-  message: {
+  title: {
+    fontSize: 16,
     color: '#fff',
-    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
-  empty: {
-    color: '#aaa',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 40,
+  description: {
+    fontSize: 14,
+    color: '#ccc',
+    marginBottom: 5,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#777',
   },
 });

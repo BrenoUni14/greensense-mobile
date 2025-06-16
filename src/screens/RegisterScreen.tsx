@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import styles from '../styles/registerStyles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { AuthContext } from '../context/AuthContext';
-import { registerRequest } from '../services/authService';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Nome obrigatório'),
@@ -27,15 +26,28 @@ const RegisterScreen = ({ navigation }: any) => {
   }) => {
     try {
       setLoading(true);
-      const response = await registerRequest({
-        nome: values.name,
-        email: values.email,
-        senha: values.password,
+
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome: values.name,
+          email: values.email,
+          senha: values.password,
+        }),
       });
-      login(response.token, response.nome); // autentica após cadastro
+
+      if (!response.ok) {
+        throw new Error('Erro ao registrar');
+      }
+
+      const data = await response.json();
+      // Esperado: { token, id, nome }
+      login(data.token, data.id, data.nome);
     } catch (error) {
-      console.error('Erro no registro:', error);
-      Alert.alert('Erro', 'Não foi possível criar a conta');
+      Alert.alert('Erro', 'Falha ao registrar. Verifique os dados ou tente mais tarde.');
     } finally {
       setLoading(false);
     }
@@ -43,7 +55,12 @@ const RegisterScreen = ({ navigation }: any) => {
 
   return (
     <Formik
-      initialValues={{ name: '', email: '', password: '', confirmPassword: '' }}
+      initialValues={{
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      }}
       validationSchema={validationSchema}
       onSubmit={handleRegister}
     >
@@ -64,6 +81,7 @@ const RegisterScreen = ({ navigation }: any) => {
             style={styles.input}
             placeholder="Email"
             keyboardType="email-address"
+            autoCapitalize="none"
             onChangeText={handleChange('email')}
             onBlur={handleBlur('email')}
             value={values.email}
@@ -92,8 +110,12 @@ const RegisterScreen = ({ navigation }: any) => {
             <Text style={{ color: 'red' }}>{errors.confirmPassword}</Text>
           )}
 
-          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()} disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? 'Registrando...' : 'Registrar'}</Text>
+          <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Registrar</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
