@@ -1,4 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
@@ -26,41 +28,25 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 16,
-  },
-  notificationCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1E1E1E',
-    padding: 16,
-    borderRadius: 8,
     marginBottom: 12,
   },
-  notificationText: {
-    color: '#FFFFFF',
-    fontSize: 14,
+  map: {
+    flex: 1,
+    height: height * 0.65,
+    borderRadius: 12,
+    marginBottom: 20,
   },
-  notificationDate: {
-    color: '#AAAAAA',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  clearButton: {
+  backButton: {
     backgroundColor: '#4CAF50',
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'center',
+    paddingVertical: 14,
     borderRadius: 8,
-    marginTop: 12,
   },
-  clearButtonText: {
+  backButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  noNotificationsText: {
-    color: '#CCCCCC',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 50,
   },
 });

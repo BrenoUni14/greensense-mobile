@@ -3,7 +3,16 @@ import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
 
-export default function TrashBinDetailsScreen() {
+export default function TrashBinDetailsScreen({ route }) {
+  const { trashBin } = route.params || {
+    trashBin: {
+      name: 'Lixeira E03',
+      location: 'Avenida Goiania, 650',
+      level: '90% Cheia',
+      lastCollected: '20 Mar 2025',
+      sensorStatus: 'Online',
+    },
+  };
   const [isCollecting, setIsCollecting] = useState(false);
 
   const handleStartCollection = () => {
@@ -29,19 +38,19 @@ export default function TrashBinDetailsScreen() {
       </View>
 
       {/* TrashBin Name */}
-      <Text style={styles.trashName}>Lixeira E03</Text>
+      <Text style={styles.trashName}>{trashBin.name}</Text>
 
       {/* Status */}
       <View style={[styles.statusBadge, { backgroundColor: isCollecting ? '#333333' : '#8B0000' }]}>
-        <Text style={styles.statusText}>{isCollecting ? 'Em Coleta...' : '90% Cheia'}</Text>
+        <Text style={styles.statusText}>{isCollecting ? 'Em Coleta...' : trashBin.level}</Text>
       </View>
 
       {/* Info Card */}
       <View style={styles.infoCard}>
         <Text style={styles.infoTitle}>Informações</Text>
-        <Text style={styles.infoText}>ID: E03</Text>
-        <Text style={styles.infoText}>Última Coleta: 20 Mar 2025</Text>
-        <Text style={styles.infoText}>Status do Sensor: Online</Text>
+        <Text style={styles.infoText}>ID: {trashBin.name}</Text>
+        <Text style={styles.infoText}>Última Coleta: {trashBin.lastCollected}</Text>
+        <Text style={styles.infoText}>Status do Sensor: {trashBin.sensorStatus}</Text>
       </View>
 
       {/* Start/Finish Button */}
@@ -57,7 +66,7 @@ export default function TrashBinDetailsScreen() {
 
       {/* Address */}
       <TouchableOpacity style={styles.addressCard} onPress={handleCopyAddress}>
-        <Text style={styles.addressText}>Avenida Goiania, 650</Text>
+        <Text style={styles.addressText}>{trashBin.location}</Text>
         <Ionicons name="copy-outline" size={18} color="#FFFFFF" />
       </TouchableOpacity>
     </View>

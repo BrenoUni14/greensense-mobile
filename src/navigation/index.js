@@ -9,6 +9,8 @@ import HomeScreen from '../screens/HomeScreen';
 import TrashBinsScreen from '../screens/TrashBinsScreen';
 import TrashBinDetailsScreen from '../screens/TrashBinDetailsScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import MapScreen from '../screens/MapScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,6 +28,8 @@ function TabNavigator() {
             iconName = 'trash';
           } else if (route.name === 'Notifications') {
             iconName = 'notifications';
+          } else if (route.name === 'Profile') {
+            iconName = 'person';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -38,6 +42,7 @@ function TabNavigator() {
       <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Tab.Screen name="TrashBins" component={TrashBinsScreen} options={{ headerShown: false }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }
@@ -49,6 +54,7 @@ export default function StackNavigator() {
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Screen name="TrashBinDetails" component={TrashBinDetailsScreen} />
+      <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );
 }

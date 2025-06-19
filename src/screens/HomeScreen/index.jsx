@@ -39,7 +39,10 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Button - Ver Mapa de Lixeiras */}
-      <TouchableOpacity style={styles.mapButton}>
+      <TouchableOpacity
+        style={styles.mapButton}
+        onPress={() => navigation.navigate('Map')}
+      >
         <Ionicons name="location-outline" size={20} color="white" style={{ marginRight: 8 }} />
         <Text style={styles.mapButtonText}>Ver Mapa de Lixeiras</Text>
       </TouchableOpacity>
