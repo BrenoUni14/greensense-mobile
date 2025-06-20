@@ -28,7 +28,6 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Greeting */}
       <View style={styles.header}>
         <Text style={styles.greeting}>Olá,{"\n"}<Text style={styles.username}>Gabriel Maia</Text></Text>
         <Ionicons
@@ -39,7 +38,6 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
 
-      {/* Status Cards */}
       <View style={styles.cardsContainer}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Coletas{'\n'}Pendentes:</Text>
@@ -55,7 +53,6 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
 
-      {/* Button - Ver Mapa de Lixeiras */}
       <TouchableOpacity
         style={styles.mapButton}
         onPress={() => navigation.navigate('Map')}
@@ -64,7 +61,6 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.mapButtonText}>Ver Mapa de Lixeiras</Text>
       </TouchableOpacity>
 
-      {/* Lixeiras */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Lixeiras</Text>
@@ -76,15 +72,14 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.trashList}>
           {trashBins.map(item => (
             <View key={item.id} style={styles.trashItem}>
-              <Text style={styles.trashName}>{item.name}</Text>
-              <Text style={styles.trashLocation}>{item.location}</Text>
-              <Text style={styles.trashLevel}>{item.level}</Text>
+              <Text style={styles.trashName}>{item.tipo}</Text>
+              <Text style={styles.trashLocation}>{item.endereco}</Text>
+              <Text style={styles.trashLevel}>{item.nivelAtual} %</Text>
             </View>
           ))}
         </View>
       </View>
 
-      {/* Alertas Recentes */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Alertas Recentes</Text>
         {alerts.map(item => (

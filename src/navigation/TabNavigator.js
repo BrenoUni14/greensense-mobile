@@ -1,22 +1,16 @@
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
-import LoginScreen from '../screens/LoginScreen';
-import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 import TrashBinsScreen from '../screens/TrashBinsScreen';
-import TrashBinDetailsScreen from '../screens/TrashBinDetailsScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import MapScreen from '../screens/MapScreen';
 import HelpScreen from '../screens/HelpScreen';
 
-const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function TabNavigator() {
+export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -48,19 +42,5 @@ function TabNavigator() {
       <Tab.Screen name="Help" component={HelpScreen} options={{ headerShown: false }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
     </Tab.Navigator>
-  );
-}
-
-export default function StackNavigator() {
-  return (
-    <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
-      <Stack.Screen name="MainTabs" component={TabNavigator} />
-      <Stack.Screen name="TrashBinDetails" component={TrashBinDetailsScreen} />
-      <Stack.Screen name="Map" component={MapScreen} />
-      <Stack.Screen name="Revisions" component={RevisionsScreen} />
-      <Stack.Screen name="Occurrences" component={OccurrencesScreen} />
-    </Stack.Navigator>
   );
 }

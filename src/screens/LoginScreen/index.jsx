@@ -18,6 +18,7 @@ export default function LoginScreen({ navigation }) {
     try {
       await signIn(email, password);
     } catch (err) {
+      console.error('Erro ao logar:', err);
       setError('Erro ao acessar. Verifique suas credenciais.');
     } finally {
       setLoading(false);
@@ -43,6 +44,7 @@ export default function LoginScreen({ navigation }) {
           placeholder="E-mail"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
         />

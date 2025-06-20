@@ -2,7 +2,7 @@ import api from './api';
 
 export const getTrashBins = async () => {
   try {
-    const response = await api.get('/trashbins');
+    const response = await api.get('/api/lixeiras');
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar lixeiras:', error);
@@ -12,7 +12,7 @@ export const getTrashBins = async () => {
 
 export const createTrashBin = async (trashBin) => {
   try {
-    const response = await api.post('/trashbins', trashBin);
+    const response = await api.post('/api/lixeiras', trashBin);
     return response.data;
   } catch (error) {
     console.error('Erro ao criar lixeira:', error);
@@ -22,7 +22,7 @@ export const createTrashBin = async (trashBin) => {
 
 export const updateTrashBin = async (id, trashBin) => {
   try {
-    const response = await api.put(`/trashbins/${id}`, trashBin);
+    const response = await api.put(`/api/lixeiras/${id}`, trashBin);
     return response.data;
   } catch (error) {
     console.error('Erro ao atualizar lixeira:', error);
@@ -32,7 +32,7 @@ export const updateTrashBin = async (id, trashBin) => {
 
 export const deleteTrashBin = async (id) => {
   try {
-    await api.delete(`/trashbins/${id}`);
+    await api.delete(`/api/lixeiras/${id}`);
   } catch (error) {
     console.error('Erro ao deletar lixeira:', error);
     throw error;

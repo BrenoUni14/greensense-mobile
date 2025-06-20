@@ -86,9 +86,9 @@ export default function TrashBinsScreen() {
         trashBins.map((bin) => (
           <View key={bin.id} style={styles.trashItem}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.trashName}>{bin.name}</Text>
-              <Text style={styles.trashLocation}>{bin.location}</Text>
-              <Text style={styles.trashLevel}>{bin.level}</Text>
+              <Text style={styles.trashName}>{bin.tipo}</Text>
+              <Text style={styles.trashLocation}>{bin.endereco}</Text>
+              <Text style={styles.trashLevel}>{bin.nivelAtual} %</Text>
             </View>
             <View style={styles.actions}>
               <TouchableOpacity

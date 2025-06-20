@@ -25,7 +25,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function signIn(email, password) {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await api.post('/api/auth/login', {
+      username: email,   // backend espera "username"
+      senha: password    // backend espera "senha"
+    });
+
     const { token, user: userData } = response.data;
 
     await AsyncStorage.setItem('@greensense:user', JSON.stringify(userData));
@@ -35,9 +39,14 @@ export function AuthProvider({ children }) {
     setUser(userData);
   }
 
-  async function signUp(name, email, password) {
-    await api.post('/auth/register', { name, email, password });
-    await signIn(email, password); // Faz login automático após criar
+  async function signUp(email, password) {
+    await api.post('/api/auth/register', {
+      username: email,
+      senha: password,
+      role: 'operacional'
+    });
+
+    await signIn(email, password); // login automático após registro
   }
 
   async function signOut() {

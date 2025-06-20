@@ -1,23 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Modal, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import styles from './styles';
 
 export default function TrashBinModal({ visible, onClose, onSubmit, trashBin }) {
-  const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
-  const [level, setLevel] = useState('');
+  const [tipo, setTipo] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [capacidadeMaxima, setCapacidadeMaxima] = useState('');
+  const [nivelAtual, setNivelAtual] = useState('');
 
   useEffect(() => {
     if (trashBin) {
-      setName(trashBin.name);
-      setLocation(trashBin.location);
-      setLevel(trashBin.level);
+      setTipo(trashBin.tipo);
+      setEndereco(trashBin.endereco);
+      setCapacidadeMaxima(trashBin.capacidadeMaxima.toString());
+      setNivelAtual(trashBin.nivelAtual.toString());
     } else {
-      setName('');
-      setLocation('');
-      setLevel('');
+      setTipo('');
+      setEndereco('');
+      setCapacidadeMaxima('');
+      setNivelAtual('');
     }
   }, [trashBin]);
+
+  const handleSave = () => {
+    if (!tipo || !endereco || !capacidadeMaxima) {
+      Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const newBin = {
+      tipo,
+      endereco,
+      capacidadeMaxima: parseInt(capacidadeMaxima, 10),
+      nivelAtual: parseInt(nivelAtual || '0', 10),
+    };
+
+    if (trashBin?.id) {
+      newBin.id = trashBin.id;
+    }
+
+    onSubmit(newBin);
+  };
 
   return (
     <Modal
@@ -30,27 +53,36 @@ export default function TrashBinModal({ visible, onClose, onSubmit, trashBin }) 
           <Text style={styles.modalTitle}>{trashBin ? 'Editar Lixeira' : 'Nova Lixeira'}</Text>
 
           <TextInput
-            placeholder="Nome da Lixeira"
+            placeholder="Tipo de Lixeira"
             placeholderTextColor="#AAAAAA"
             style={styles.input}
-            value={name}
-            onChangeText={setName}
+            value={tipo}
+            onChangeText={setTipo}
           />
 
           <TextInput
-            placeholder="Localização"
+            placeholder="Endereço"
             placeholderTextColor="#AAAAAA"
             style={styles.input}
-            value={location}
-            onChangeText={setLocation}
+            value={endereco}
+            onChangeText={setEndereco}
           />
 
           <TextInput
-            placeholder="Nível (%)"
+            placeholder="Capacidade Máxima"
             placeholderTextColor="#AAAAAA"
             style={styles.input}
-            value={level}
-            onChangeText={setLevel}
+            value={capacidadeMaxima}
+            onChangeText={setCapacidadeMaxima}
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            placeholder="Nível Atual (%)"
+            placeholderTextColor="#AAAAAA"
+            style={styles.input}
+            value={nivelAtual}
+            onChangeText={setNivelAtual}
             keyboardType="numeric"
           />
 
@@ -59,19 +91,7 @@ export default function TrashBinModal({ visible, onClose, onSubmit, trashBin }) 
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.buttonSave}
-              onPress={() => {
-                const newBin = { name, location, level: `${level}% Cheia` };
-
-                // Se for edição, pode incluir o ID
-                if (trashBin?.id) {
-                  newBin.id = trashBin.id;
-                }
-
-                onSubmit(newBin);
-              }}
-            >
+            <TouchableOpacity style={styles.buttonSave} onPress={handleSave}>
               <Text style={styles.buttonText}>Salvar</Text>
             </TouchableOpacity>
           </View>
