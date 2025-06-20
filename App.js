@@ -8,4 +8,4 @@ export default function App() {
       <RootNavigator />
     </AuthProvider>
   );
-}
+} /* comentando algo*/
