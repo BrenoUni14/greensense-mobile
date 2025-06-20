@@ -1,14 +1,26 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, FlatList, Image } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
+import { AuthContext } from '../../contexts/AuthContext';
+import { getTrashBins } from '../../services/trashBinService';
 
 export default function HomeScreen({ navigation }) {
-  const trashBins = [
-    { id: '1', name: 'Lixeira A12', location: 'Avenida Paulista', level: '90% Cheia' },
-    { id: '2', name: 'Lixeira C08', location: 'Parque Ibirapuera', level: '43% Cheia' },
-    { id: '3', name: 'Lixeira F24', location: 'Avenida Goias', level: '35% Cheia' },
-  ];
+  const { signOut } = useContext(AuthContext);
+
+  const [trashBins, setTrashBins] = useState([]);
+
+  useEffect(() => {
+    const fetchTrashBins = async () => {
+      try {
+        const data = await getTrashBins();
+        setTrashBins(data);
+      } catch (error) {
+        console.error('Erro ao carregar lixeiras:', error);
+      }
+    };
+    fetchTrashBins();
+  }, []);
 
   const alerts = [
     { id: '1', message: 'Sensor Offline: Lixeira A45' },
@@ -19,7 +31,12 @@ export default function HomeScreen({ navigation }) {
       {/* Greeting */}
       <View style={styles.header}>
         <Text style={styles.greeting}>Olá,{"\n"}<Text style={styles.username}>Gabriel Maia</Text></Text>
-        <Ionicons name="log-out-outline" size={24} color="white" />
+        <Ionicons
+          name="log-out-outline"
+          size={24}
+          color="white"
+          onPress={signOut}
+        />
       </View>
 
       {/* Status Cards */}

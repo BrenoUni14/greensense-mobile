@@ -1,14 +1,37 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ImageBackground, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
+import { AuthContext } from '../../contexts/AuthContext';
 
 export default function SignUpScreen() {
   const navigation = useNavigation();
+  const { signUp } = useContext(AuthContext);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      setError('As senhas não coincidem.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await signUp(name, email, password);
+    } catch (err) {
+      setError('Erro ao criar conta. Verifique os dados.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ImageBackground
@@ -53,8 +76,10 @@ export default function SignUpScreen() {
           onChangeText={setConfirmPassword}
         />
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Criar e acessar</Text>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
+          {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Criar e acessar</Text>}
         </TouchableOpacity>
 
         <TouchableOpacity

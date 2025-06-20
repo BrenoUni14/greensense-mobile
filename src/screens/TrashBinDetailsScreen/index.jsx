@@ -1,74 +1,128 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import TrashBinModal from '../../components/TrashBinModal';
+import ConfirmDeleteModal from '../../components/ConfirmDeleteModal';
 import styles from './styles';
+import {
+  getTrashBins,
+  createTrashBin,
+  updateTrashBin,
+  deleteTrashBin,
+} from '../../services/trashBinService';
 
-export default function TrashBinDetailsScreen({ route }) {
-  const { trashBin } = route.params || {
-    trashBin: {
-      name: 'Lixeira E03',
-      location: 'Avenida Goiania, 650',
-      level: '90% Cheia',
-      lastCollected: '20 Mar 2025',
-      sensorStatus: 'Online',
-    },
+export default function TrashBinsScreen() {
+  const [trashBins, setTrashBins] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBin, setSelectedBin] = useState(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [binToDelete, setBinToDelete] = useState(null);
+
+  const loadTrashBins = async () => {
+    try {
+      const data = await getTrashBins();
+      setTrashBins(data);
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao carregar lixeiras.');
+    }
   };
-  const [isCollecting, setIsCollecting] = useState(false);
 
-  const handleStartCollection = () => {
-    setIsCollecting(true);
-    Alert.alert('Rota de Coleta Iniciada');
+  useEffect(() => {
+    loadTrashBins();
+  }, []);
+
+  const handleSaveBin = async (newBin) => {
+    try {
+      if (newBin.id) {
+        await updateTrashBin(newBin.id, newBin);
+      } else {
+        await createTrashBin(newBin);
+      }
+      await loadTrashBins();
+      setModalVisible(false);
+      setSelectedBin(null);
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao salvar lixeira.');
+    }
   };
 
-  const handleFinishCollection = () => {
-    setIsCollecting(false);
-    Alert.alert('Coleta Finalizada');
-  };
-
-  const handleCopyAddress = () => {
-    Alert.alert('Endereço copiado!');
+  const handleDeleteBin = async () => {
+    try {
+      await deleteTrashBin(binToDelete.id);
+      await loadTrashBins();
+      setDeleteModalVisible(false);
+      setBinToDelete(null);
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao deletar lixeira.');
+    }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Olá,{"\n"}<Text style={styles.username}>Gabriel Maia</Text></Text>
-        <Ionicons name="log-out-outline" size={24} color="white" />
-      </View>
-
-      {/* TrashBin Name */}
-      <Text style={styles.trashName}>{trashBin.name}</Text>
-
-      {/* Status */}
-      <View style={[styles.statusBadge, { backgroundColor: isCollecting ? '#333333' : '#8B0000' }]}>
-        <Text style={styles.statusText}>{isCollecting ? 'Em Coleta...' : trashBin.level}</Text>
-      </View>
-
-      {/* Info Card */}
-      <View style={styles.infoCard}>
-        <Text style={styles.infoTitle}>Informações</Text>
-        <Text style={styles.infoText}>ID: {trashBin.name}</Text>
-        <Text style={styles.infoText}>Última Coleta: {trashBin.lastCollected}</Text>
-        <Text style={styles.infoText}>Status do Sensor: {trashBin.sensorStatus}</Text>
-      </View>
-
-      {/* Start/Finish Button */}
-      {isCollecting ? (
-        <TouchableOpacity style={styles.finishButton} onPress={handleFinishCollection}>
-          <Text style={styles.buttonText}>Finalizar Coleta</Text>
+        <Text style={styles.title}>Lixeiras</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            setSelectedBin(null);
+            setModalVisible(true);
+          }}
+        >
+          <Ionicons name="add" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-      ) : (
-        <TouchableOpacity style={styles.startButton} onPress={handleStartCollection}>
-          <Text style={styles.buttonText}>Iniciar Rota de Coleta</Text>
-        </TouchableOpacity>
-      )}
+      </View>
 
-      {/* Address */}
-      <TouchableOpacity style={styles.addressCard} onPress={handleCopyAddress}>
-        <Text style={styles.addressText}>{trashBin.location}</Text>
-        <Ionicons name="copy-outline" size={18} color="#FFFFFF" />
-      </TouchableOpacity>
-    </View>
+      {trashBins.map((bin) => (
+        <View key={bin.id} style={styles.trashItem}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.trashName}>{bin.name}</Text>
+            <Text style={styles.trashLocation}>{bin.location}</Text>
+            <Text style={styles.trashLevel}>{bin.level}</Text>
+          </View>
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => {
+                setSelectedBin(bin);
+                setModalVisible(true);
+              }}
+            >
+              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => {
+                setBinToDelete(bin);
+                setDeleteModalVisible(true);
+              }}
+            >
+              <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+
+      {/* Modal de criar/editar */}
+      <TrashBinModal
+        visible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedBin(null);
+        }}
+        onSubmit={handleSaveBin}
+        trashBin={selectedBin}
+      />
+
+      {/* Modal de confirmação de delete */}
+      <ConfirmDeleteModal
+        visible={deleteModalVisible}
+        onCancel={() => {
+          setDeleteModalVisible(false);
+          setBinToDelete(null);
+        }}
+        onConfirm={handleDeleteBin}
+      />
+    </ScrollView>
   );
 }

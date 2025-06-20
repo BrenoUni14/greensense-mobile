@@ -1,8 +1,29 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ImageBackground, Image, ActivityIndicator } from 'react-native';
 import styles from './styles';
+import { AuthContext } from '../../contexts/AuthContext';
 
 export default function LoginScreen({ navigation }) {
+  const { signIn } = useContext(AuthContext);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      await signIn(email, password);
+    } catch (err) {
+      setError('Erro ao acessar. Verifique suas credenciais.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ImageBackground
       source={require('../../assets/background-login.jpeg')}
@@ -22,6 +43,8 @@ export default function LoginScreen({ navigation }) {
           placeholder="E-mail"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
 
         <TextInput
@@ -29,10 +52,14 @@ export default function LoginScreen({ navigation }) {
           placeholder="Senha"
           placeholderTextColor="#999"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Acessar</Text>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+          {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Acessar</Text>}
         </TouchableOpacity>
 
         <Text style={styles.linkText}>Ainda não tem acesso?</Text>

@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TrashBinModal from '../../components/TrashBinModal';
 import ConfirmDeleteModal from '../../components/ConfirmDeleteModal';
 import styles from './styles';
+import {
+  getTrashBins,
+  createTrashBin,
+  updateTrashBin,
+  deleteTrashBin
+} from '../../services/trashBinService';
 
 export default function TrashBinsScreen() {
-  const [trashBins, setTrashBins] = useState([
-    { id: '1', name: 'Lixeira A12', location: 'Avenida Paulista', level: '90% Cheia' },
-    { id: '2', name: 'Lixeira C08', location: 'Parque Ibirapuera', level: '43% Cheia' },
-    { id: '3', name: 'Lixeira F24', location: 'Avenida Goias', level: '35% Cheia' },
-  ]);
+  const [trashBins, setTrashBins] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBin, setSelectedBin] = useState(null);
@@ -18,25 +21,44 @@ export default function TrashBinsScreen() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [binToDelete, setBinToDelete] = useState(null);
 
-  const handleSaveBin = (newBin) => {
-    setTrashBins(prevBins => {
-      const existingIndex = prevBins.findIndex(bin => bin.id === newBin.id);
-      if (existingIndex >= 0) {
-        // Update
-        const updatedBins = [...prevBins];
-        updatedBins[existingIndex] = newBin;
-        return updatedBins;
+  useEffect(() => {
+    fetchTrashBins();
+  }, []);
+
+  const fetchTrashBins = async () => {
+    setLoading(true);
+    try {
+      const data = await getTrashBins();
+      setTrashBins(data);
+    } catch (error) {
+      console.error('Erro ao carregar lixeiras:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveBin = async (newBin) => {
+    try {
+      if (newBin.id) {
+        await updateTrashBin(newBin.id, newBin);
       } else {
-        // Create
-        return [...prevBins, newBin];
+        await createTrashBin(newBin);
       }
-    });
+      await fetchTrashBins();
+    } catch (error) {
+      console.error('Erro ao salvar lixeira:', error);
+    }
     setModalVisible(false);
     setSelectedBin(null);
   };
 
-  const handleDeleteBin = () => {
-    setTrashBins(prevBins => prevBins.filter(bin => bin.id !== binToDelete.id));
+  const handleDeleteBin = async () => {
+    try {
+      await deleteTrashBin(binToDelete.id);
+      await fetchTrashBins();
+    } catch (error) {
+      console.error('Erro ao deletar lixeira:', error);
+    }
     setDeleteModalVisible(false);
     setBinToDelete(null);
   };
@@ -56,38 +78,43 @@ export default function TrashBinsScreen() {
         </TouchableOpacity>
       </View>
 
-      {trashBins.map((bin) => (
-        <View key={bin.id} style={styles.trashItem}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.trashName}>{bin.name}</Text>
-            <Text style={styles.trashLocation}>{bin.location}</Text>
-            <Text style={styles.trashLevel}>{bin.level}</Text>
-          </View>
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => {
-                setSelectedBin(bin);
-                setModalVisible(true);
-              }}
-            >
-              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
-            </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator color="#4CAF50" size="large" style={{ marginTop: 50 }} />
+      ) : trashBins.length === 0 ? (
+        <Text style={styles.noDataText}>Nenhuma lixeira cadastrada.</Text>
+      ) : (
+        trashBins.map((bin) => (
+          <View key={bin.id} style={styles.trashItem}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.trashName}>{bin.name}</Text>
+              <Text style={styles.trashLocation}>{bin.location}</Text>
+              <Text style={styles.trashLevel}>{bin.level}</Text>
+            </View>
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => {
+                  setSelectedBin(bin);
+                  setModalVisible(true);
+                }}
+              >
+                <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => {
-                setBinToDelete(bin);
-                setDeleteModalVisible(true);
-              }}
-            >
-              <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => {
+                  setBinToDelete(bin);
+                  setDeleteModalVisible(true);
+                }}
+              >
+                <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        ))
+      )}
 
-      {/* Modal de criar/editar */}
       <TrashBinModal
         visible={modalVisible}
         onClose={() => {
@@ -98,7 +125,6 @@ export default function TrashBinsScreen() {
         trashBin={selectedBin}
       />
 
-      {/* Modal de confirmação de delete */}
       <ConfirmDeleteModal
         visible={deleteModalVisible}
         onCancel={() => {

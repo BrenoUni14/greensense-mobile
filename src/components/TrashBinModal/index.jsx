@@ -62,7 +62,13 @@ export default function TrashBinModal({ visible, onClose, onSubmit, trashBin }) 
             <TouchableOpacity
               style={styles.buttonSave}
               onPress={() => {
-                const newBin = { id: trashBin?.id || Date.now().toString(), name, location, level: `${level}% Cheia` };
+                const newBin = { name, location, level: `${level}% Cheia` };
+
+                // Se for edição, pode incluir o ID
+                if (trashBin?.id) {
+                  newBin.id = trashBin.id;
+                }
+
                 onSubmit(newBin);
               }}
             >

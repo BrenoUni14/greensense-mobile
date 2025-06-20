@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
+import { getNotifications } from '../../services/notificationService';
 
 export default function NotificationsScreen() {
-  const [notifications, setNotifications] = useState([
-    { id: '1', message: 'Sensor Offline: Lixeira A45', date: '25 Jul 2025' },
-    { id: '2', message: 'Nível Crítico: Lixeira C08', date: '24 Jul 2025' },
-    { id: '3', message: 'Nova Lixeira Adicionada: Lixeira F10', date: '23 Jul 2025' },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const data = await getNotifications();
+      setNotifications(data);
+    } catch (error) {
+      console.error('Erro ao carregar notificações:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClearNotifications = () => {
     setNotifications([]);
@@ -26,23 +40,22 @@ export default function NotificationsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.greeting}>
           Olá,{"\n"}<Text style={styles.username}>Gabriel Maia</Text>
         </Text>
-        <Ionicons name="log-out-outline" size={24} color="white" />
+        <Ionicons name="notifications" size={24} color="white" />
       </View>
 
-      {/* Title */}
       <Text style={styles.title}>Notificações</Text>
 
-      {/* Lista de Notificações */}
-      {notifications.length > 0 ? (
+      {loading ? (
+        <ActivityIndicator color="#4CAF50" size="large" style={{ marginTop: 50 }} />
+      ) : notifications.length > 0 ? (
         <>
           <FlatList
             data={notifications}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
             renderItem={renderItem}
             contentContainerStyle={{ paddingBottom: 20 }}
           />
